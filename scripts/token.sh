@@ -90,8 +90,10 @@ case $rc in
     /usr/bin/security delete-generic-password -s "$SERVICE" -a "$slug" >/dev/null 2>&1 || true
     echo >&2
     echo "Deleted the token again: it can never pass the startup check for '$slug'." >&2
-    echo "Copy the secret from the integration created in '$name' and rerun" >&2
-    echo "  make token SLUG=$slug" >&2
+    echo "Either the secret came from an integration in another workspace (copy it" >&2
+    echo "from the integration created in '$name'), or the workspace above is the" >&2
+    echo "right one and the name in workspaces.yml is spelled differently (fix it)." >&2
+    echo "Then rerun: make token SLUG=$slug" >&2
     exit 1
     ;;
   *)
