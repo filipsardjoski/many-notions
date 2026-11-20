@@ -60,7 +60,8 @@ Storing the Notion token for '$slug'
   access      $access
   keychain    service $SERVICE, account $slug
 
-Paste the integration's Internal Integration Secret at the prompt below.
+Paste the connection's API token (Configuration tab, Integration token; older
+Notion screens call it the Internal Integration Secret) at the prompt below.
 Nothing is echoed, and security asks for it twice.
 
 EOF

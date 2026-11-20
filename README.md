@@ -122,29 +122,31 @@ and reopen it. It reads its config once at launch.
 1. **Sign in as a workspace owner or admin** of the workspace in question.
    Guests cannot create integrations, and members may not be allowed to,
    depending on the workspace's settings.
-2. Open [notion.so/profile/integrations](https://www.notion.so/profile/integrations)
-   and create a **new integration**. Type: **Internal**. Associated workspace:
-   the one whose name you wrote in `workspaces.yml`. The integration's own name
-   is what you will pick from the Connections menu later, so something like
-   `Claude (read)` is useful.
-3. In the integration's **Configuration** tab, set the capabilities:
-   - `access: read`: tick **Read content** only. Untick Update content and
-     Insert content. Leave comment capabilities off unless you want Claude to
-     read comments, and set user capabilities to **No user information**.
+2. Open [notion.so/profile/integrations](https://www.notion.so/profile/integrations),
+   which Notion now labels **Developer tools › Developer connections**, and
+   create a new **internal** connection. Installable in: the workspace whose
+   name you wrote in `workspaces.yml`. Its name is what you will pick from the
+   Connections menu later, so something like `Claude (read)` is useful.
+3. On its **Configuration** tab, under **Capabilities**:
+   - `access: read`: tick **Read content** only, and leave Update content and
+     Insert content unticked. **Read comments** is safe to keep, since it only
+     reads; leave **Insert comments** off. Under user capabilities choose
+     **No user information**. Leave the agent capabilities unticked.
    - `access: write`: Read content, Update content and Insert content, plus
      comments if you want them.
-   Save.
-4. Copy the **Internal Integration Secret** from the same tab. Do not paste it
-   into a chat, a file or a terminal command. The next step asks for it.
-5. Run `make token SLUG=<slug>` and paste the secret at the prompt. Nothing is
+   Notion saves each change as you make it.
+4. Copy the token from **Integration token › API token** on the same tab, with
+   the copy icon at the right-hand end of the field. Older Notion screens call
+   it the Internal Integration Secret. Do not paste it into a chat, a file or a
+   terminal command. The next step asks for it.
+5. Run `make token SLUG=<slug>` and paste the token at the prompt. Nothing is
    echoed, `security` asks for it twice, and it goes straight into the
    Keychain. The script then checks which workspace it belongs to, and deletes
    it again if Notion rejects it or reports a different workspace.
-6. **Share the root pages.** An integration sees nothing until pages are shared
-   with it. On each top-level page you want reachable, open the page menu
-   (`•••`), choose **Connections**, and add the integration. Child pages
-   inherit the connection. The integration's **Access** tab does the same in
-   bulk.
+6. **Share the root pages.** A connection sees nothing until pages are shared
+   with it. Either add them on its **Content access** tab, or open each
+   top-level page's menu (`•••`), choose **Connections**, and add it. Child
+   pages are included.
 7. Run `make verify`. It fails with `NOTHING SHARED` until step 6 is done.
 
 On first launch from Claude Desktop, macOS can show a Keychain prompt asking
