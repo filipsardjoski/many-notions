@@ -1,0 +1,10 @@
+{
+  "name": "many-notions",
+  "version": "0.1.0",
+  "private": true,
+  "description": "One local Notion MCP server per workspace, pinned by process, next to Claude's official connector.",
+  "license": "MIT",
+  "dependencies": {
+    "@notionhq/notion-mcp-server": "2.6.1"
+  }
+}

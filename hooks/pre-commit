@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Refuse a commit whose staged tree carries real workspace data or a token.
+# Installed by `make install`, which sets core.hooksPath to this directory.
+# Bypassing it with --no-verify is possible, and is exactly the mistake it is
+# here to catch, so fix what it reports instead.
+exec python3 "$(git rev-parse --show-toplevel)/scripts/check-leaks.py" --staged

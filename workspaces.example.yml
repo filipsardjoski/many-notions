@@ -1,0 +1,32 @@
+# Copy this to workspaces.yml and edit it. workspaces.yml is gitignored,
+# because it names real workspaces and is specific to your machine.
+#
+#   cp workspaces.example.yml workspaces.yml
+#   $EDITOR workspaces.yml
+#
+# One entry per Notion workspace. Each becomes one MCP server, notion-<slug>,
+# running with that workspace's token and nothing else.
+#
+# slug          the server name suffix and the Keychain account the token is
+#               stored under. Lowercase letters, digits and single hyphens.
+# name          the workspace's name exactly as Notion shows it. The launcher
+#               asks Notion which workspace the token belongs to and refuses to
+#               start unless it is this one. Case and repeated spaces are
+#               ignored, nothing else is.
+# access        read or write. Defaults to read. Must match the capabilities
+#               the integration was created with: read means Read content
+#               only, and that capability is what Notion enforces.
+# workspace_id  optional. When set, and Notion reports an id for the token,
+#               the id is compared instead of the name, which survives a
+#               rename and tells apart two workspaces with the same name.
+#               make verify prints the value to paste here.
+
+workspaces:
+  - slug: acme
+    name: Acme Inc
+    access: read
+
+  - slug: side-project
+    name: Side Project
+    access: write
+    # workspace_id: 00000000-0000-0000-0000-000000000000

@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+"""
+notion-mcp <slug>
+
+Start Notion's official MCP server for exactly one workspace, over stdio.
+
+    1. Look the slug up in workspaces.yml. Unknown or missing: exit.
+    2. Read that slug's token from the macOS Keychain. Missing: exit.
+    3. Ask Notion which workspace the token belongs to (GET /v1/users/me) and
+       compare it with the entry. Mismatch, or no way to tell: exit.
+    4. Replace this process with the pinned @notionhq/notion-mcp-server from
+       this repo's node_modules, by absolute path, with the token in
+       NOTION_TOKEN and an environment built from scratch.
+
+The workspace is a property of the process. Nothing a client sends after
+startup can point this server at another workspace, because the server only
+ever holds the one token, and there is no path from one slug to another's.
+
+The token never appears in argv, in a config file, on stdout, or in a log.
+stderr gets one line on success, which Claude Desktop records in
+~/Library/Logs/Claude/mcp-server-notion-<slug>.log, and the reason on failure.
+"""
+
+import os
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "lib"))
+import workspaces as ws  # noqa: E402
+
+
+def die(message, code=1):
+    print(f"notion-mcp: {message}", file=sys.stderr)
+    sys.exit(code)
+
+
+def main(argv):
+    if len(argv) != 2 or argv[1].startswith("-"):
+        die("usage: notion-mcp <slug>   (a slug from workspaces.yml)", 2)
+    slug = argv[1]
+    if not ws.SLUG_RE.match(slug):
+        die(f"{slug!r} is not a valid slug", 2)
+
+    try:
+        entries = ws.load_workspaces()
+    except ws.Problem as exc:
+        die(str(exc))
+
+    entry = ws.find(entries, slug)
+    if entry is None:
+        known = ", ".join(e["slug"] for e in entries)
+        die(
+            f"no workspace '{slug}' in workspaces.yml (known: {known}). "
+            "Refusing to start rather than guess."
+        )
+
+    try:
+        node = ws.node_binary()
+        cli = ws.upstream_cli()
+        token = ws.read_token(slug)
+        me = ws.whoami(token)
+    except ws.Problem as exc:
+        die(f"{ws.server_name(slug)}: {exc}")
+
+    identity = ws.check_identity(entry, me)
+    if not identity.ok:
+        die(
+            f"WRONG WORKSPACE for {ws.server_name(slug)}: {identity.detail}. "
+            "Refusing to start. Store the right token with "
+            f"'make token SLUG={slug}', or fix the entry in workspaces.yml."
+        )
+    if identity.note:
+        print(f"notion-mcp: {slug}: {identity.note}", file=sys.stderr)
+
+    print(
+        f"notion-mcp: {ws.server_name(slug)} verified by {identity.by}: "
+        f"workspace '{identity.actual_name}', access {entry['access']}",
+        file=sys.stderr,
+    )
+    sys.stderr.flush()
+
+    env = ws.child_env(token, node)
+    os.execve(node, [node, str(cli), "--transport", "stdio"], env)
+
+
+if __name__ == "__main__":
+    main(sys.argv)

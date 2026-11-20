@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Commit messages are published with the history and cannot be edited after a
+# push without rewriting it, so they get the same check as the files.
+exec python3 "$(git rev-parse --show-toplevel)/scripts/check-leaks.py" --message "$1"
