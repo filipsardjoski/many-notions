@@ -121,8 +121,8 @@ def main(argv):
                 continue
             if count == 0:
                 fail(
-                    f"{result}, NOTHING SHARED  share root pages with the "
-                    "integration: page menu, Connections"
+                    f"{result}, NOTHING SHARED  share pages on the connection's "
+                    "Content access tab, or page menu, Connections"
                 )
                 continue
             result += f", search sees {count}{'+' if more else ''}"
